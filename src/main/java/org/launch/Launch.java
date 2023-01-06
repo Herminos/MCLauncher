@@ -1,114 +1,60 @@
 package org.launch;
 
-import java.util.Objects;
-import java.util.Scanner;
+import org.to2mbn.jmccc.auth.OfflineAuthenticator;
+import org.to2mbn.jmccc.exec.GameProcessListener;
+import org.to2mbn.jmccc.launch.LaunchException;
+import org.to2mbn.jmccc.launch.Launcher;
+import org.to2mbn.jmccc.launch.LauncherBuilder;
+import org.to2mbn.jmccc.option.LaunchOption;
+import org.to2mbn.jmccc.option.MinecraftDirectory;
 
-import static org.launch.Download.DownloadMinecraft;
-import static org.launch.Launch.LaunchGame;
+import java.io.IOException;
 
-public class Option
-{
-    public static void GetHelp()
+public class Launch {
+    public static void LaunchCore(String version,String PlayerName,String Directory,int MaxMemory,int MinMemory) throws IOException, LaunchException
     {
-        System.out.println("Type \"v\" to set the version(defaults to 1.11.2)");
-        System.out.println("Type \"n\" to set the playername(defaults to \"ID\")");
-        System.out.println("Type \"d\" to set the Minecraft game directory(defaults to \"minecraft\"(Warning:Most Windows computer's Minecraft directory is\".minecraft\"))");
-        System.out.println("Type \"advhelp\" to get the advance option-setting help");
-        System.out.println("Type \"download\" to download a Minecraft version");
-        System.out.println("Type \"show\" to show the current options");
-    }
-    public static void GetAdvanceHelp()
-    {
-        System.out.println("Type \"maxm\" to set the JVM's MaxMemory");
-        System.out.println("Type \"minm\" to set the JVM's MinMemory");
-    }
-    public static void SetOptions()
-    {
-        System.out.println("Set Options");
-        String version="1.11.2";
-        String Directory="minecraft";
-        String PlayerName="ID";
-        int MaxMemory=0;
-        int MinMemory=0;
-        while(true)
+
+        Launcher launcher= LauncherBuilder.create()
+                .setDebugPrintCommandline(true).setNativeFastCheck(false).build();
+        LaunchOption option=new LaunchOption(version,new OfflineAuthenticator
+                (PlayerName), new MinecraftDirectory(Directory));
+        option.setMaxMemory(MaxMemory);
+        option.setMinMemory(MinMemory);
+        GameProcessListener ConsoleListener= new GameProcessListener()
         {
-            Scanner scanner=new Scanner(System.in);
-            String input=scanner.next();
-            System.out.println(input);
-            if(Objects.equals(input, "v"))
+            @Override
+            public void onLog(String log)
             {
-                System.out.println("Set Version");
-                Scanner scanner1=new Scanner(System.in);
-                version=scanner1.nextLine();
-                System.out.println("New Version:"+version);
+                System.out.println("[INFO]:"+log);
             }
-            else if(Objects.equals(input, "n"))
+
+            @Override
+            public void onErrorLog(String log)
             {
-                System.out.println("Set Playername");
-                Scanner scanner1=new Scanner(System.in);
-                PlayerName=scanner1.nextLine();
-                System.out.println("New Playername:"+PlayerName);
+                System.out.println("[ERROR]:"+log);
             }
-            else if(Objects.equals(input, "d"))
+
+            @Override
+            public void onExit(int code)
             {
-                System.out.println("Set Directory");
-                Scanner scanner1=new Scanner(System.in);
-                Directory=scanner1.nextLine();
-                System.out.println("New Directory:"+Directory);
+                System.out.println("[EXIT]:The process exit with exit code: "+code);
             }
-            else if(Objects.equals(input,"maxm"))
-            {
-                System.out.println("Set JVM's MaxMemory(MB)(0 for default)");
-                Scanner scanner1=new Scanner(System.in);
-                MaxMemory=scanner1.nextInt();
-                if(Objects.equals(MaxMemory,0))
-                    System.out.println("New JVM's MaxMemory: default");
-                else
-                    System.out.println("New JVM's MaxMemory: "+MaxMemory);
-            }
-            else if(Objects.equals(input,"minm"))
-            {
-                System.out.println("Set JVM's MinMemory(MB)(0 for default)");
-                Scanner scanner1=new Scanner(System.in);
-                MinMemory=scanner1.nextInt();
-                if(Objects.equals(MaxMemory,0))
-                    System.out.println("New JVM's MinMemory: default");
-                else
-                    System.out.println("New JVM's MinMemory: "+MinMemory);
-            }
-            else if(Objects.equals(input, "help"))
-            {
-                GetHelp();
-            }
-            else if(Objects.equals(input,"advhelp"))
-            {
-                GetAdvanceHelp();
-            }
-            else if(Objects.equals(input,"show"))
-            {
-                System.out.println("Current Directory: "+Directory);
-                System.out.println("Current Playname: "+PlayerName);
-                System.out.println("Current Version: "+version);
-                System.out.println("Current JVM's MaxMemory: "+MaxMemory);
-                System.out.println("Current JVM's MinMemory: "+MinMemory);
-            }
-            else if(Objects.equals(input,"download"))
-            {
-                System.out.println("Current Directory:"+Directory);
-                System.out.println("Type the version you want to download");
-                Scanner scanner1=new Scanner(System.in);
-                String DownloadVersion=scanner1.nextLine();
-                DownloadMinecraft(DownloadVersion,Directory);
-            }
-            else if(Objects.equals(input, "launch"))
-            {
-                LaunchGame(version,PlayerName,Directory,MaxMemory,MinMemory);
-                break;
-            }
-            else
-            {
-                System.out.println("Unknown Command,Type \"help\" to check your syntax");
-            }
+        };
+        launcher.launch(option,ConsoleListener);
+    }
+    public static void LaunchGame(String version,String PlayerName,String Directory,int MaxMemory,int MinMemory)
+    {
+        try
+        {
+            LaunchCore(version,PlayerName,Directory,MaxMemory,MinMemory);
+        }
+        catch(IOException e)
+        {
+            System.out.println(e);
+        }
+        catch(LaunchException e)
+        {
+            System.out.println(e);
         }
     }
 }
