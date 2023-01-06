@@ -3,6 +3,7 @@ package org.launch;
 import java.util.Objects;
 import java.util.Scanner;
 
+import static org.launch.Download.DownloadMinecraft;
 import static org.launch.Launch.LaunchGame;
 
 public class Option
@@ -13,6 +14,8 @@ public class Option
         System.out.println("Type \"n\" to set the playername(defaults to \"ID\")");
         System.out.println("Type \"d\" to set the Minecraft game directory(defaults to \"minecraft\"(Warning:Most Windows computer's Minecraft directory is\".minecraft\"))");
         System.out.println("Type \"advhelp\" to get the advance option-setting help");
+        System.out.println("Type \"download\" to download a Minecraft version");
+        System.out.println("Type \"show\" to show the current options");
     }
     public static void GetAdvanceHelp()
     {
@@ -80,6 +83,22 @@ public class Option
             else if(Objects.equals(input,"advhelp"))
             {
                 GetAdvanceHelp();
+            }
+            else if(Objects.equals(input,"show"))
+            {
+                System.out.println("Current Directory: "+Directory);
+                System.out.println("Current Playname: "+PlayerName);
+                System.out.println("Current Version: "+version);
+                System.out.println("Current JVM's MaxMemory: "+MaxMemory);
+                System.out.println("Current JVM's MinMemory: "+MinMemory);
+            }
+            else if(Objects.equals(input,"download"))
+            {
+                System.out.println("Current Directory:"+Directory);
+                System.out.println("Type the version you want to download");
+                Scanner scanner1=new Scanner(System.in);
+                String DownloadVersion=scanner1.nextLine();
+                DownloadMinecraft(DownloadVersion,Directory);
             }
             else if(Objects.equals(input, "launch"))
             {
