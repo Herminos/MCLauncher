@@ -11,13 +11,15 @@ import org.to2mbn.jmccc.option.MinecraftDirectory;
 import java.io.IOException;
 
 public class Launch {
-    public static void LaunchCore(String version,String PlayerName,String Directory) throws IOException, LaunchException
+    public static void LaunchCore(String version,String PlayerName,String Directory,int MaxMemory,int MinMemory) throws IOException, LaunchException
     {
 
         Launcher launcher= LauncherBuilder.create()
                 .setDebugPrintCommandline(true).setNativeFastCheck(false).build();
         LaunchOption option=new LaunchOption(version,new OfflineAuthenticator
                 (PlayerName), new MinecraftDirectory(Directory));
+        option.setMaxMemory(MaxMemory);
+        option.setMinMemory(MinMemory);
         GameProcessListener ConsoleListener= new GameProcessListener()
         {
             @Override
@@ -40,11 +42,11 @@ public class Launch {
         };
         launcher.launch(option,ConsoleListener);
     }
-    public static void LaunchGame(String version,String PlayerName,String Directory)
+    public static void LaunchGame(String version,String PlayerName,String Directory,int MaxMemory,int MinMemory)
     {
         try
         {
-            LaunchCore(version,PlayerName,Directory);
+            LaunchCore(version,PlayerName,Directory,MaxMemory,MinMemory);
         }
         catch(IOException e)
         {
