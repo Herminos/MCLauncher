@@ -1,6 +1,4 @@
 package org.launch;
-import java.util.Scanner;
-import static org.launch.Launch.LaunchGame;
 import static org.launch.Option.SetOptions;
 
 public class Main
